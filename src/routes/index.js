@@ -8,6 +8,24 @@ const validatePos = pos => {
   return true;
 };
 
+const matchRobotId = robotId => {
+  const matchId = /^robot#([1-9][0-9]*)$/
+  const matched = robotId.match(matchId)
+  if (isNaN(matched[1])) {
+    throw new Error()
+  }
+  return parseInt(matchId[1])
+}
+
+const getCoordFromPosition = robot_position => {
+  try {
+    const robot_id = matchRobotId(req.body.first_pos)
+    return robots[robot_id].position
+  } catch(err) {
+    return robot_position
+  }
+}
+
 const distance = (first_pos, second_pos) => {
   if (!validatePos(first_pos) || !validatePos(second_pos)) {
     throw new Error();
@@ -26,7 +44,10 @@ router.get("/", function(req, res, next) {
 
 /* Baseline Feature. */
 router.post("/distance", function(req, res, next) {
-  res.json({ distance: distance(req.body.first_pos, req.body.second_pos) });
+  let first_pos, second_pos
+  const first_pos = getCoordFromPosition(req.body.first_pos)
+  const second_pos = getCoordFromPosition(req.body.second_pos)
+  res.json({ distance: distance(first_pos, second_pos) });
 });
 
 router.put("/robot/:id/position", function(req, res, next) {
