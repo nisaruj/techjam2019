@@ -1,15 +1,15 @@
 var express = require("express");
 var router = express.Router();
+const robots = {};
+
+const validatePos = pos => {
+  if (pos === undefined || pos.x === undefined || pos.y === undefined)
+    return false;
+  return true;
+};
 
 const distance = (first_pos, second_pos) => {
-  if (
-    first_pos === undefined ||
-    second_pos === undefined ||
-    first_pos.x === undefined ||
-    first_pos.y === undefined ||
-    second_pos.x === undefined ||
-    second_pos.y === undefined
-  ) {
+  if (!validatePos(first_pos) || !validatePos(second_pos)) {
     throw new Error();
   }
 
@@ -24,9 +24,20 @@ router.get("/", function(req, res, next) {
   res.json({ message: "Hello world!" });
 });
 
-/* Base line Feature. */
+/* Baseline Feature. */
 router.post("/distance", function(req, res, next) {
   res.json({ distance: distance(req.body.first_pos, req.body.second_pos) });
 });
 
+router.put("/robot/:id/position", function(req, res, next) {
+  if (!validatePos(req.body.position)) {
+    throw new Error();
+  }
+  robots[req.params.id] = req.body;
+  res.status(204).send();
+});
+
+router.get("/robot/:id/position", function(req, res, next) {
+  res.json({ position: robots[req.params.id].position });
+});
 module.exports = router;
