@@ -38,6 +38,9 @@ router.put("/robot/:id/position", function(req, res, next) {
 });
 
 router.get("/robot/:id/position", function(req, res, next) {
+  if (robots[req.params.id] === undefined) {
+    res.status(404).send();
+  }
   res.json({ position: robots[req.params.id].position });
 });
 module.exports = router;
